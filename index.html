@@ -3,320 +3,380 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FTTH Geo-Planner & RAB Engine Pro</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>FTTH Planner Pro — Custom Edition</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     
     <style>
-        #map { height: calc(100vh - 160px); }
-        
-        /* Mengatur tampilan khusus saat dicetak / disimpan ke PDF */
+        :root {
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --card-border: rgba(226, 232, 240, 0.7);
+            --brand-primary: #4f46e5;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+            background-color: #f8fafc;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.06) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.06) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(236, 72, 153, 0.04) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(#cbd5e1 0.75px, transparent 0.75px);
+            background-size: 24px 24px;
+            opacity: 0.3;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .main-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 20px;
+            padding: 2.2rem;
+            color: #ffffff;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-custom {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: 0 4px 18px -4px rgba(15, 23, 42, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .card-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.06);
+        }
+
+        .total-budget-box {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 1.6rem;
+        }
+
+        .form-control, .form-select {
+            border-color: #cbd5e1;
+            padding: 0.65rem 1rem;
+            border-radius: 12px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+            border-color: var(--brand-primary);
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            color: #fff; border: none; padding: 0.65rem 1.5rem; border-radius: 12px; font-weight: 600;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .badge-component {
+            background-color: #64748b; color: white; font-size: 0.75rem;
+        }
+
         @media print {
-            body { background: white !important; color: rgb(206, 26, 26) !important; overflow: visible !important; }
-            .no-print { display: none !important; }
-            .print-full { width: 100% !important; height: auto !important; position: relative !important; float: none !important; }
-            #map { height: 350px !important; page-break-inside: avoid; border: 2px solid #000; }
-            .print-border { border: 1px solid #cbd5e1 !important; color: black !important; }
-            th, td { color: black !important; border-bottom: 1px solid #000 !important; }
+            .no-print, .btn, .action-col, .settings-panel { display: none !important; }
+            body { background: #fff !important; }
+            body::before { display: none; }
+            .card-custom { border: 1px solid #cbd5e1 !important; box-shadow: none !important; background: #fff !important;}
+            .main-header { background: #f1f5f9 !important; color: #0f172a !important; padding: 1.5rem; border: 1px solid #cbd5e1 !important;}
+            .main-header p, .main-header span { color: #475569 !important; }
         }
     </style>
 </head>
-<body class="bg-gray-950 text-slate-100 font-sans overflow-x-hidden">
+<body>
 
-    <header class="bg-gray-900 border-b border-gray-800 p-4 flex flex-col sm:flex-row items-center justify-between shadow-2xl no-print">
-        <h1 class="text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400">
-            🚀 Perencanaan FTTH By Rahmat Dandi Bugis
-        </h1>
-        <button id="btn-print" class="bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg shadow-teal-950/50 transition transform hover:scale-105 flex items-center gap-2 text-sm">
-            🖨️ Cetak Dokumen & RAB Perencanaan
-        </button>
-    </header>
-
-    <div class="hidden print:block mb-6 text-center border-b-4 border-double border-gray-800 pb-4">
-        <h1 class="text-2xl font-black text-black">LAPORAN HASIL PERENCANAAN JARINGAN FTTH</h1>
-        <p class="text-sm text-gray-600 uppercase tracking-widest mt-1">Dokumen Rancangan Anggaran Biaya & Manifes Koordinat Lokasi</p>
-        <p class="text-xs text-gray-400 mt-0.5">Sistem Perencana Finansial Geospasial Fiber Optik</p>
-    </div>
-
-    <div class="flex flex-col lg:flex-row w-full print-full">
-        
-        <main class="w-full lg:w-1/2 p-4 flex flex-col gap-4 print-full">
-            <div class="bg-gray-900 border border-gray-800 p-3 rounded-2xl flex flex-wrap gap-2 justify-between items-center shadow-lg no-print">
-                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">Pilih Node:</span>
-                <div class="flex flex-wrap gap-1.5">
-                    <button id="btn-odc" class="tool-btn bg-gray-800 border border-blue-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-blue-900/30 transition text-blue-400">🏢 ODC</button>
-                    <button id="btn-odp" class="tool-btn bg-gray-800 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-amber-900/30 transition text-amber-400">📦 ODP</button>
-                    <button id="btn-tiang" class="tool-btn bg-gray-800 border border-gray-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-gray-700 transition text-gray-300">💈 Tiang</button>
-                    <button id="btn-rumah" class="tool-btn bg-gray-800 border border-green-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-green-900/30 transition text-green-400">🏠 Rumah</button>
-                    <button id="btn-kabel" class="tool-btn bg-purple-950/40 border border-purple-700 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-purple-900/50 text-purple-300 transition">🔌 Jalur Kabel</button>
-                </div>
-                <button id="btn-reset" class="bg-red-950/60 border border-red-800 text-red-400 text-xs px-3 py-1.5 rounded-xl hover:bg-red-900 transition">Reset</button>
-            </div>
-
-            <div class="bg-gray-900 border border-gray-800 rounded-3xl overflow-hidden shadow-2xl relative print-full">
-                <div id="map" class="w-full"></div>
-                <div id="active-indicator" class="absolute bottom-4 left-4 bg-gray-950/95 border border-cyan-500/50 px-4 py-2 rounded-full text-xs text-cyan-400 font-bold z-[1000] hidden shadow-xl backdrop-blur-md"></div>
-            </div>
-        </main>
-
-        <aside class="w-full lg:w-1/2 p-4 flex flex-col gap-4 print-full">
-            
-            <div class="bg-gray-900 border border-gray-800 p-4 rounded-3xl shadow-xl no-print">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-1">⚙️ Set Tarif Jaringan (Rupiah)</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <div>
-                        <label class="block text-[10px] text-gray-500 font-bold uppercase">Harga ODC / Unit</label>
-                        <input type="number" id="price-odc" value="18500000" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none focus:border-cyan-500 font-semibold text-cyan-400">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-gray-500 font-bold uppercase">Harga ODP / Unit</label>
-                        <input type="number" id="price-odp" value="4200000" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none focus:border-cyan-500 font-semibold text-amber-400">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-gray-500 font-bold uppercase">Harga Tiang / Btg</label>
-                        <input type="number" id="price-tiang" value="1400000" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none focus:border-cyan-500 font-semibold text-gray-300">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-gray-500 font-bold uppercase">Harga Rumah (Drop)</label>
-                        <input type="number" id="price-rumah" value="450000" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none focus:border-cyan-500 font-semibold text-green-400">
-                    </div>
-                    <div class="col-span-2 sm:col-span-2">
-                        <label class="block text-[10px] text-gray-500 font-bold uppercase">Harga Kabel / Meter</label>
-                        <input type="number" id="price-kabel" value="18000" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none focus:border-cyan-500 font-semibold text-purple-400">
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-gray-900 border border-gray-800 p-5 rounded-3xl shadow-xl print-full print-border">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-800 pb-2 print:text-black print:border-black">📊 RINGKASAN ANGGARAN BIAYA (RAB)</h3>
-                <table class="w-full text-left text-xs print:text-black">
-                    <thead>
-                        <tr class="border-b border-gray-800 text-gray-500 text-[10px] uppercase tracking-wider">
-                            <th class="pb-2">Deskripsi Material</th>
-                            <th class="pb-2 text-center">Volume Kuantitas</th>
-                            <th class="pb-2 text-right">Harga Satuan</th>
-                            <th class="pb-2 text-right">Total Biaya</th>
-                        </tr>
-                    </thead>
-                    <tbody id="rab-table-body" class="divide-y divide-gray-800/40 print:divide-gray-300"></tbody>
-                    <tfoot>
-                        <tr class="border-t-2 border-gray-700 bg-gray-950/50 print:border-black print:bg-transparent">
-                            <td class="py-3 font-bold text-cyan-400 print:text-black" colspan="3">TOTAL ESTIMASI BELANJA JARINGAN</td>
-                            <td id="grand-total" class="py-3 font-black text-right text-sm text-emerald-400 print:text-black">Rp 0</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-
-            <div class="bg-gray-900 border border-gray-800 p-5 rounded-3xl shadow-xl flex-1 print-full print-border max-h-[350px] overflow-y-auto">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-800 pb-2 print:text-black print:border-black">📍 MANIFES KOORDINAT & LOG LOKASI UNIT</h3>
-                <table class="w-full text-left text-xs print:text-black">
-                    <thead>
-                        <tr class="border-b border-gray-800 text-gray-500 text-[10px] uppercase tracking-wider">
-                            <th class="pb-2">ID Node</th>
-                            <th class="pb-2">Titik Koordinat (Lat, Lng)</th>
-                            <th class="pb-2 text-right">Beban Biaya</th>
-                        </tr>
-                    </thead>
-                    <tbody id="manifest-table-body" class="divide-y divide-gray-800/40 print:divide-gray-300 text-[11px]">
-                        <tr id="empty-manifest"><td colspan="3" class="py-4 text-center text-gray-600 italic">Belum ada objek yang ditandai pada peta.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-        </aside>
-    </div>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<div class="container my-5">
     
-    <script>
-        // 1. Inisialisasi Peta Geospasial (Default Jakarta Pusat)
-        const map = L.map('map', { zoomControl: false }).setView([-6.2088, 106.8456], 16);
-        L.control.zoom({ position: 'topright' }).addTo(map);
+    <div class="main-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <h2 class="fw-800 m-0 d-flex align-items-center gap-2">
+                <i class="bi bi-diagram-3-fill text-info"></i> Perencanaan FTTH <span class="fs-6 text-warning fw-normal"></span>
+            </h2>
+            <p class="text-white-50 m-0 small mt-1">Jurusan Elektronika - Pelatihan Instalasi Fiber Optik</p>
+            <div class="mt-2">
+                <span class="badge bg-secondary px-2 py-1 bg-opacity-25" style="border: 1px solid rgba(255,255,255,0.15)"><i class="bi bi-person-badge-fill"></i> Perencanaan: Rahmat Dandi Bugis</span>
+            </div>
+        </div>
+        <button onclick="window.print()" class="btn btn-light btn-lg fs-6 fw-bold shadow-sm no-print d-flex align-items-center gap-2">
+            <i class="bi bi-printer"></i> Cetak Dokumen / PDF
+        </button>
+    </div>
 
-        // Menggunakan Map Tiles bertema Gelap (Dark Mode)
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-    maxZoom: 19
-}).addTo(map);
-
-        // 2. State Inventaris Jaringan
-        let currentMode = null;
-        let activeCableCoords = [];
-        let locationLog = []; 
-
-        const inventory = {
-            odc: { count: 0, priceId: 'price-odc', label: 'Optical Distribution Cabinet (ODC)' },
-            odp: { count: 0, priceId: 'price-odp', label: 'Optical Distribution Point (ODP)' },
-            tiang: { count: 0, priceId: 'price-tiang', label: 'Tiang Tumpu / Penyangga Jalur' },
-            rumah: { count: 0, priceId: 'price-rumah', label: 'Drop Core Sambungan Rumah' },
-            kabel: { count: 0, priceId: 'price-kabel', label: 'Kabel Fiber Optik Utama (Meter)' }
-        };
-
-        const colors = { odc: '#3b82f6', odp: '#f59e0b', tiang: '#9ca3af', rumah: '#10b981', kabel: '#a855f7' };
-
-        // 3. Helper Pengubah Format Angka ke Rupiah
-        function toRupiah(number) {
-            return "Rp " + parseFloat(number).toLocaleString('id-ID', { minimumFractionDigits: 0 });
-        }
-
-        // 4. Sinkronisasi Hitungan & Render Tabel RAB + Manifes Lokasi
-        function refreshDashboard() {
-            // A. UPDATE TABEL RAB
-            const rabBody = document.getElementById('rab-table-body');
-            rabBody.innerHTML = '';
-            let totalRAB = 0;
-
-            for (let key in inventory) {
-                const item = inventory[key];
-                const unitPrice = parseFloat(document.getElementById(item.priceId).value) || 0;
-                const qty = item.count;
-                const subTotal = qty * unitPrice;
-                totalRAB += subTotal;
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-900/50 text-[11px]";
-                tr.innerHTML = `
-                    <td class="py-2.5 font-medium text-slate-300">${item.label}</td>
-                    <td class="py-2.5 text-center font-bold">${key === 'kabel' ? qty.toFixed(1) + ' m' : qty + ' Unit'}</td>
-                    <td class="py-2.5 text-right text-gray-500">${toRupiah(unitPrice)}</td>
-                    <td class="py-2.5 text-right font-bold text-slate-200">${toRupiah(subTotal)}</td>
-                `;
-                rabBody.appendChild(tr);
-            }
-            document.getElementById('grand-total').innerText = toRupiah(totalRAB);
-
-            // B. UPDATE TABEL MANIFES KOORDINAT LOKASI
-            const manifestBody = document.getElementById('manifest-table-body');
-            manifestBody.innerHTML = '';
-
-            if (locationLog.length === 0) {
-                manifestBody.innerHTML = `<tr id="empty-manifest"><td colspan="3" class="py-4 text-center text-gray-600 italic">Belum ada objek yang ditandai pada peta.</td></tr>`;
-            } else {
-                locationLog.forEach(log => {
-                    const unitPrice = parseFloat(document.getElementById(inventory[log.type].priceId).value) || 0;
-                    const costValue = log.type === 'kabel' ? log.length * unitPrice : unitPrice;
-
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-gray-900/50";
-                    tr.innerHTML = `
-                        <td class="py-2 font-bold uppercase border-b border-gray-800/40" style="color: ${colors[log.type]}">${log.id}</td>
-                        <td class="py-2 font-mono text-gray-400 border-b border-gray-800/40">${log.coords}</td>
-                        <td class="py-2 text-right font-semibold text-gray-300 border-b border-gray-800/40">${toRupiah(costValue)}</td>
-                    `;
-                    manifestBody.appendChild(tr);
-                });
-            }
-        }
-
-        // 5. Mengatur Mode Penempatan Node yang Aktif
-        function setMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('bg-cyan-500', 'text-black', 'border-cyan-400'));
-            
-            const indicator = document.getElementById('active-indicator');
-            if (mode) {
-                document.getElementById(`btn-${mode}`).classList.add('bg-cyan-500', 'text-black', 'border-cyan-400');
-                indicator.innerText = `🛠️ AKTIF: Klik pada peta untuk menggambar / menaruh ${mode.toUpperCase()}`;
-                indicator.classList.remove('hidden');
-            } else {
-                indicator.classList.add('hidden');
-                activeCableCoords = [];
-            }
-        }
-
-        // Listener Deteksi Perubahan Tarif Input Pengguna
-        ['price-odc', 'price-odp', 'price-tiang', 'price-rumah', 'price-kabel'].forEach(id => {
-            document.getElementById(id).addEventListener('input', refreshDashboard);
-        });
-
-        // Listener Klik Menu Sidebar Buttons
-        document.getElementById('btn-odc').addEventListener('click', () => setMode(currentMode === 'odc' ? null : 'odc'));
-        document.getElementById('btn-odp').addEventListener('click', () => setMode(currentMode === 'odp' ? null : 'odp'));
-        document.getElementById('btn-tiang').addEventListener('click', () => setMode(currentMode === 'tiang' ? null : 'tiang'));
-        document.getElementById('btn-rumah').addEventListener('click', () => setMode(currentMode === 'rumah' ? null : 'rumah'));
-        document.getElementById('btn-kabel').addEventListener('click', () => setMode(currentMode === 'kabel' ? null : 'kabel'));
-
-        // Fungsi Reset Total Jaringan
-        document.getElementById('btn-reset').addEventListener('click', () => {
-            map.eachLayer(layer => { if (layer instanceof L.CircleMarker || layer instanceof L.Polyline) map.removeLayer(layer); });
-            for (let k in inventory) inventory[k].count = 0;
-            locationLog = [];
-            setMode(null);
-            refreshDashboard();
-        });
-
-        // Fungsi Trigger Cetak Dokumen / Simpan PDF
-        document.getElementById('btn-print').addEventListener('click', () => { window.print(); });
-
-        // 6. Logika Penempatan Item & Perekaman Koordinat Geografis saat Peta Diklik
-        map.on('click', function(e) {
-            if (!currentMode) return;
-            const { lat, lng } = e.latlng;
-
-            if (currentMode === 'kabel') {
-                activeCableCoords.push(e.latlng);
-                L.circleMarker([lat, lng], { radius: 3, color: colors.kabel, fillColor: colors.kabel }).addTo(map);
-
-                if (activeCableCoords.length >= 2) {
-                    const lastIndex = activeCableCoords.length - 1;
-                    const distance = activeCableCoords[lastIndex - 1].distanceTo(activeCableCoords[lastIndex]); // Satuan Meter Riil Bumi
-                    
-                    inventory.kabel.count += distance;
-
-                    L.polyline([activeCableCoords[lastIndex - 1], activeCableCoords[lastIndex]], {
-                        color: colors.kabel, weight: 3, opacity: 0.85, dashArray: '6, 6'
-                    }).addTo(map).bindPopup(`<b>Segmen Kabel</b><br>Panjang: ${distance.toFixed(1)} meter`);
-
-                    // Tambahkan jalur segmen ke manifes lokasi
-                    const cableId = `KBL-${locationLog.filter(l => l.type === 'kabel').length + 1}`;
-                    locationLog.push({
-                        id: cableId,
-                        type: 'kabel',
-                        coords: `Jalur Segmen (${distance.toFixed(1)} m)`,
-                        length: distance
-                    });
-
-                    refreshDashboard();
-                }
-            } else {
-                // Logika Penempatan Marker Perangkat (ODC, ODP, Tiang, Rumah)
-                const radiusSize = currentMode === 'odc' ? 9 : (currentMode === 'odp' ? 7 : 5);
+    <div class="row g-4">
+        <div class="col-lg-4 order-lg-2 no-print settings-panel">
+            <div class="card card-custom p-4 border-0 shadow-sm bg-white">
+                <h5 class="fw-bold mb-1 d-flex align-items-center gap-2 text-primary">
+                    <i class="bi bi-gear-fill animate-spin"></i> Kustom Komponen
+                </h5>
+                <p class="text-muted small mb-3">Atur daftar tipe material, harga default, dan jenis hitungan proyek Anda.</p>
                 
-                L.circleMarker([lat, lng], {
-                    radius: radiusSize,
-                    fillColor: colors[currentMode],
-                    color: '#ffffff',
-                    weight: 1.5,
-                    fillOpacity: 0.95
-                }).addTo(map).bindPopup(`
-                    <div style="color:#000; font-family:sans-serif; font-size:12px;">
-                        <b style="color:${colors[currentMode]}">${currentMode.toUpperCase()} Node</b><br>
-                        Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}
+                <div class="bg-light p-3 rounded-3 mb-3 border">
+                    <h6 class="fw-bold small mb-2 text-dark">Master Komponen Baru</h6>
+                    <div class="mb-2">
+                        <input type="text" id="custom-nama" class="form-control form-control-sm" placeholder="Nama: misal, OTB, SFP, Drop Core">
                     </div>
-                `);
+                    <div class="row g-2 mb-2">
+                        <div class="col-7">
+                            <input type="number" id="custom-harga" class="form-control form-control-sm" placeholder="Harga Default (Rp)">
+                        </div>
+                        <div class="col-5">
+                            <select id="custom-satuan" class="form-select form-select-sm">
+                                <option value="Unit">Per Unit</option>
+                                <option value="Meter">Per Meter</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="tambahKomponenKeMaster()" class="btn btn-sm btn-dark w-100 fw-bold"><i class="bi bi-plus"></i> Simpan ke Pilihan</button>
+                </div>
 
-                inventory[currentMode].count++;
-                
-                // Buat ID unik untuk dimasukkan ke Log Manifes Lokasi Tabel
-                const itemSequence = locationLog.filter(l => l.type === currentMode).length + 1;
-                const generatedId = `${currentMode.toUpperCase()}-${itemSequence}`;
+                <h6 class="fw-bold small text-muted mb-2">Daftar Pilihan Aktif:</h6>
+                <div id="daftar-master-komponen" class="d-flex flex-column gap-2" style="max-height: 200px; overflow-y: auto;">
+                    </div>
+            </div>
+        </div>
 
-                locationLog.push({
-                    id: generatedId,
-                    type: currentMode,
-                    coords: `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
-                    length: 0
-                });
+        <div class="col-lg-8 order-lg-1">
+            
+            <div class="total-budget-box d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="p-3 bg-dark text-warning rounded-3 fs-4"><i class="bi bi-wallet2"></i></div>
+                    <div>
+                        <h6 class="m-0 fw-bold text-muted text-uppercase small">Estimasi Total Nilai Proyek (BoQ)</h6>
+                        <p class="m-0 text-muted small">Akumulasi dinamis berdasarkan kustomisasi komponen</p>
+                    </div>
+                </div>
+                <h2 id="grand-total" class="fw-800 text-dark m-0">Rp 0</h2>
+            </div>
 
-                refreshDashboard();
-            }
+            <div class="card card-custom p-4 mb-4 no-print border-0">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-plus-circle text-primary"></i> Tambah Data Perencanaan
+                </h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-muted">Pilih Komponen</label>
+                        <select id="input-jenis" class="form-select" onchange="sinkronHargaForm()"></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label id="label-lokasi" class="form-label small fw-bold text-muted">Lokasi / Keterangan</label>
+                        <input type="text" id="input-lokasi" class="form-control" placeholder="Contoh: Koordinat / Nama Jalan">
+                    </div>
+                    <div class="col-md-4 d-none" id="col-panjang">
+                        <label class="form-label small fw-bold text-muted">Panjang Jaringan (Meter)</label>
+                        <input type="number" id="input-panjang" class="form-control" placeholder="100">
+                    </div>
+                    <div class="col-md-4">
+                        <label id="label-biaya" class="form-label small fw-bold text-muted">Biaya Disesuaikan (Rp)</label>
+                        <input type="number" id="input-biaya" class="form-control" value="0">
+                    </div>
+                    <div class="col-12 text-end">
+                        <button onclick="tambahDataKeTabel()" class="btn btn-primary-custom px-4 d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-plus-lg"></i> Masukkan ke Rincian
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-custom p-4 border-0">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-list-stars text-secondary"></i> Rincian Jaringan Hasil Kustomisasi
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle border-0 m-0" id="tabel-utama">
+                        <thead class="table-light border-bottom border-top-0">
+                            <tr>
+                                <th style="width: 8%">No</th>
+                                <th style="width: 22%">Komponen</th>
+                                <th style="width: 38%">Deskripsi Lokasi / Volume</th>
+                                <th style="width: 22%" class="text-end">Total Biaya</th>
+                                <th style="width: 10%" class="text-center action-col">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-data" class="border-0">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. DATA MASTER KOMPONENT DEFAULT (Bisa Ditambah/Hapus Secara Bebas dari Web)
+    let masterKomponen = {
+        "Tiang": { harga: 1200000, satuan: "Unit" },
+        "Kabel": { harga: 15000, satuan: "Meter" },
+        "ODP": { harga: 3500000, satuan: "Unit" },
+        "ODC": { harga: 15000000, satuan: "Unit" },
+        "Rumah": { harga: 500000, satuan: "Unit" }
+    };
+
+    // Render Pilihan dropdown & list kustomisasi di awal load halaman
+    window.onload = function() {
+        renderMasterKomponen();
+    };
+
+    function renderMasterKomponen() {
+        let selectJenis = document.getElementById('input-jenis');
+        let listMaster = document.getElementById('daftar-master-komponen');
+        
+        // Simpan pilihan terpilih saat ini jika ada
+        let selectedValue = selectJenis.value;
+
+        selectJenis.innerHTML = "";
+        listMaster.innerHTML = "";
+
+        for (let key in masterKomponen) {
+            // Tambahkan ke dropdown Form Input
+            let option = document.createElement('option');
+            option.value = key;
+            option.innerText = `${key} (${masterKomponen[key].satuan})`;
+            selectJenis.appendChild(option);
+
+            // Tambahkan ke panel manajemen kanan
+            let itemDiv = document.createElement('div');
+            itemDiv.className = "d-flex justify-content-between align-items-center bg-white p-2 border rounded-3 small shadow-sm";
+            itemDiv.innerHTML = `
+                <div>
+                    <span class="fw-bold text-dark">${key}</span>
+                    <span class="text-muted d-block" style="font-size:11px;">${formatRupiah(masterKomponen[key].harga)} / ${masterKomponen[key].satuan}</span>
+                </div>
+                <button onclick="hapusMasterKomponen('${key}')" class="btn btn-sm btn-link text-danger p-0 border-0 no-print"><i class="bi bi-x-circle-fill"></i></button>
+            `;
+            listMaster.appendChild(listMaster.innerText === "" ? itemDiv : itemDiv);
+        }
+
+        // Kembalikan nilai dropdown terpilih atau set default ke elemen pertama
+        if(masterKomponen[selectedValue]) {
+            selectJenis.value = selectedValue;
+        }
+        sinkronHargaForm();
+    }
+
+    // Fungsi menambah komponen baru ke sistem
+    function tambahKomponenKeMaster() {
+        let nama = document.getElementById('custom-nama').value.trim();
+        let harga = parseFloat(document.getElementById('custom-harga').value);
+        let satuan = document.getElementById('custom-satuan').value;
+
+        if (!nama || isNaN(harga)) return alert("Harap isi Nama komponen dan Harga default dengan benar!");
+        
+        // Kapitalisasi awal kata
+        nama = nama.charAt(0).toUpperCase() + nama.slice(1);
+
+        masterKomponen[nama] = { harga: harga, satuan: satuan };
+        
+        // Bersihkan form custom
+        document.getElementById('custom-nama').value = '';
+        document.getElementById('custom-harga').value = '';
+        
+        renderMasterKomponen();
+    }
+
+    function hapusMasterKomponen(key) {
+        if(Object.keys(masterKomponen).length <= 1) return alert("Minimal harus menyisakan 1 komponen dalam sistem!");
+        delete masterKomponen[key];
+        renderMasterKomponen();
+    }
+
+    // Sinkronisasi otomatis form utama ketika dropdown diganti
+    function sinkronHargaForm() {
+        let jenis = document.getElementById('input-jenis').value;
+        let colPanjang = document.getElementById('col-panjang');
+        let labelLokasi = document.getElementById('label-lokasi');
+        let labelBiaya = document.getElementById('label-biaya');
+        let inputBiaya = document.getElementById('input-biaya');
+
+        if(!masterKomponen[jenis]) return;
+
+        inputBiaya.value = masterKomponen[jenis].harga;
+
+        if (masterKomponen[jenis].satuan === "Meter") {
+            colPanjang.classList.remove('d-none');
+            labelLokasi.innerText = "Titik Ruas (A → B)";
+            labelBiaya.innerText = "Biaya / Meter (Rp)";
+        } else {
+            colPanjang.classList.add('d-none');
+            labelLokasi.innerText = "Lokasi / Koordinat";
+            labelBiaya.innerText = "Biaya Satuan (Rp)";
+        }
+    }
+
+    function formatRupiah(angka) {
+        return "Rp " + parseFloat(angka).toLocaleString('id-ID');
+    }
+
+    // Memasukkan data rancangan ke tabel BoQ rincian pro
+    function tambahDataKeTabel() {
+        let jenis = document.getElementById('input-jenis').value;
+        let lokasi = document.getElementById('input-lokasi').value;
+        let biaya = parseFloat(document.getElementById('input-biaya').value) || 0;
+        let panjang = parseFloat(document.getElementById('input-panjang').value) || 0;
+
+        if (!lokasi) return alert("Harap isi kolom Lokasi/Keterangan terlebih dahulu!");
+
+        let deskripsi = lokasi;
+        let totalBiayaItem = biaya;
+
+        if (masterKomponen[jenis].satuan === "Meter") {
+            if (panjang <= 0) return alert("Harap isi panjang meter jaringan dengan benar!");
+            deskripsi = `${lokasi} [Volume: ${panjang} meter]`;
+            totalBiayaItem = panjang * biaya;
+        } else {
+            deskripsi = `${lokasi} [Volume: 1 Unit]`;
+        }
+
+        let tbody = document.getElementById('tbody-data');
+        let no = tbody.rows.length + 1;
+        let row = tbody.insertRow();
+
+        row.innerHTML = `
+            <td class="fw-bold text-muted">${no}</td>
+            <td><span class="badge badge-component px-3 py-2 rounded-3 text-uppercase font-monospace">${jenis}</span></td>
+            <td class="fw-medium">${deskripsi}</td>
+            <td class="text-end fw-bold hitung-biaya text-dark" data-total="${totalBiayaItem}">${formatRupiah(totalBiayaItem)}</td>
+            <td class="text-center action-col"><button onclick="hapusBaris(this)" class="btn btn-sm btn-link text-danger p-0 border-0 m-0 text-decoration-none fw-bold"><i class="bi bi-trash3"></i> Hapus</button></td>
+        `;
+
+        hitungGrandTotal();
+        document.getElementById('input-lokasi').value = '';
+        document.getElementById('input-panjang').value = '';
+    }
+
+    function hapusBaris(btn) {
+        btn.closest('tr').remove();
+        let rows = document.querySelectorAll('#tbody-data tr');
+        rows.forEach((r, i) => r.cells[0].innerText = i + 1);
+        hitungGrandTotal();
+    }
+
+    function hitungGrandTotal() {
+        let grandTotal = 0;
+        document.querySelectorAll('.hitung-biaya').forEach(td => {
+            grandTotal += parseFloat(td.getAttribute('data-total')) || 0;
         });
+        document.getElementById('grand-total').innerText = formatRupiah(grandTotal);
+    }
+</script>
 
-        // Inisialisasi Rendering di Awal Pemuatan Halaman
-        refreshDashboard();
-    </script>
 </body>
 </html>
