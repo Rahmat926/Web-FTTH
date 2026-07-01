@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FTTH Planner Pro — Custom Edition</title>
+    <title>Perencanaan FTTH</title>
+    <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Plus Jakarta Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     
     <style>
         :root {
             --text-dark: #0f172a;
             --text-muted: #64748b;
-            --card-border: rgba(226, 232, 240, 0.7);
+            --card-border: rgba(226, 232, 240, 0.8);
             --brand-primary: #4f46e5;
         }
 
@@ -29,57 +32,34 @@
         }
 
         body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-image: radial-gradient(#cbd5e1 0.75px, transparent 0.75px);
-            background-size: 24px 24px;
-            opacity: 0.3;
-            z-index: -1;
-            pointer-events: none;
+            background-size: 24px 24px; opacity: 0.3; z-index: -1; pointer-events: none;
         }
 
         .main-header {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border-radius: 20px;
-            padding: 2.2rem;
-            color: #ffffff;
-            margin-bottom: 2.5rem;
+            border-radius: 20px; padding: 2.2rem; color: #ffffff; margin-bottom: 2.5rem;
             box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.25);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .card-custom {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            box-shadow: 0 4px 18px -4px rgba(15, 23, 42, 0.03);
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border); border-radius: 16px;
+            box-shadow: 0 4px 18px -4px rgba(15, 23, 42, 0.03); transition: all 0.3s ease;
         }
 
         .card-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.06);
+            transform: translateY(-2px); box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.06);
         }
 
         .total-budget-box {
-            background: rgba(255, 255, 255, 0.8);
-            border: 2px dashed #cbd5e1;
-            border-radius: 16px;
-            padding: 1.6rem;
+            background: rgba(255, 255, 255, 0.8); border: 2px dashed #cbd5e1; border-radius: 16px; padding: 1.6rem;
         }
 
-        .form-control, .form-select {
-            border-color: #cbd5e1;
-            padding: 0.65rem 1rem;
-            border-radius: 12px;
-        }
-
-        .form-control:focus, .form-select:focus {
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
-            border-color: var(--brand-primary);
-        }
+        .form-control, .form-select { border-color: #cbd5e1; padding: 0.65rem 1rem; border-radius: 12px; }
+        .form-control:focus, .form-select:focus { box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15); border-color: var(--brand-primary); }
 
         .btn-primary-custom {
             background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
@@ -87,15 +67,17 @@
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
         }
 
-        .badge-component {
-            background-color: #64748b; color: white; font-size: 0.75rem;
-        }
+        .badge-tiang { background-color: #4f46e5; color: white; }
+        .badge-kabel { background-color: #0ea5e9; color: white; }
+        .badge-odp { background-color: #10b981; color: white; }
+        .badge-odc { background-color: #f59e0b; color: #0f172a; }
+        .badge-rumah { background-color: #ec4899; color: white; }
+        .badge-lainnya { background-color: #64748b; color: white; }
 
         @media print {
             .no-print, .btn, .action-col, .settings-panel { display: none !important; }
-            body { background: #fff !important; }
-            body::before { display: none; }
-            .card-custom { border: 1px solid #cbd5e1 !important; box-shadow: none !important; background: #fff !important;}
+            body { background: #fff !important; } body::before { display: none; }
+            .card-custom { border: 1px solid #cbd5e1 !important; box-shadow: none !important; background: #fff !important; transform: none !important;}
             .main-header { background: #f1f5f9 !important; color: #0f172a !important; padding: 1.5rem; border: 1px solid #cbd5e1 !important;}
             .main-header p, .main-header span { color: #475569 !important; }
         }
@@ -105,12 +87,13 @@
 
 <div class="container my-5">
     
+    <!-- HEADER PANEL -->
     <div class="main-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
         <div>
             <h2 class="fw-800 m-0 d-flex align-items-center gap-2">
                 <i class="bi bi-diagram-3-fill text-info"></i> Perencanaan FTTH <span class="fs-6 text-warning fw-normal"></span>
             </h2>
-            <p class="text-white-50 m-0 small mt-1">Jurusan Elektronika - Pelatihan Instalasi Fiber Optik</p>
+            <p class="text-white-50 m-0 small mt-1">Jurusan ELEKTRONIKA Pelatihan Instalasi Fiber Optik</p>
             <div class="mt-2">
                 <span class="badge bg-secondary px-2 py-1 bg-opacity-25" style="border: 1px solid rgba(255,255,255,0.15)"><i class="bi bi-person-badge-fill"></i> Perencanaan: Rahmat Dandi Bugis</span>
             </div>
@@ -121,97 +104,111 @@
     </div>
 
     <div class="row g-4">
+        <!-- SEKSI KANAN: PANEL MANAJEMEN KUSTOMISASI MATERIAL (NO-PRINT) -->
         <div class="col-lg-4 order-lg-2 no-print settings-panel">
-            <div class="card card-custom p-4 border-0 shadow-sm bg-white">
+            <div class="card card-custom p-4 border-0 shadow-sm bg-white mb-4">
                 <h5 class="fw-bold mb-1 d-flex align-items-center gap-2 text-primary">
-                    <i class="bi bi-gear-fill animate-spin"></i> Kustom Komponen
+                    <i class="bi bi-sliders"></i> Manajemen Komponen
                 </h5>
-                <p class="text-muted small mb-3">Atur daftar tipe material, harga default, dan jenis hitungan proyek Anda.</p>
+                <p class="text-muted small mb-3">Modifikasi harga satuan master material FTTH di bawah ini.</p>
                 
-                <div class="bg-light p-3 rounded-3 mb-3 border">
-                    <h6 class="fw-bold small mb-2 text-dark">Master Komponen Baru</h6>
+                <div class="bg-light p-3 rounded-3 border">
                     <div class="mb-2">
-                        <input type="text" id="custom-nama" class="form-control form-control-sm" placeholder="Nama: misal, OTB, SFP, Drop Core">
+                        <label class="small fw-bold text-muted">Kategori Material</label>
+                        <select id="custom-kategori" class="form-select form-select-sm" onchange="gantiLabelSatuan()">
+                            <option value="Tiang">Tiang Jaringan</option>
+                            <option value="Kabel">Kabel Fiber Optik</option>
+                            <option value="ODP">ODP (Distribution Point)</option>
+                            <option value="ODC">ODC (Distribution Cabinet)</option>
+                            <option value="Rumah">Rumah Pelanggan (Homepass)</option>
+                        </select>
                     </div>
-                    <div class="row g-2 mb-2">
-                        <div class="col-7">
-                            <input type="number" id="custom-harga" class="form-control form-control-sm" placeholder="Harga Default (Rp)">
-                        </div>
-                        <div class="col-5">
-                            <select id="custom-satuan" class="form-select form-select-sm">
-                                <option value="Unit">Per Unit</option>
-                                <option value="Meter">Per Meter</option>
-                            </select>
-                        </div>
+                    <div class="mb-2">
+                        <label class="small fw-bold text-muted">Nama / Kode Spesifikasi</label>
+                        <input type="text" id="custom-nama" class="form-control form-control-sm" placeholder="Contoh: Tiang T7 Premium, Kabel Drop 2C">
                     </div>
-                    <button onclick="tambahKomponenKeMaster()" class="btn btn-sm btn-dark w-100 fw-bold"><i class="bi bi-plus"></i> Simpan ke Pilihan</button>
+                    <div class="mb-3">
+                        <label id="custom-label-harga" class="small fw-bold text-muted">Harga Satuan (Per Unit)</label>
+                        <input type="number" id="custom-harga" class="form-control form-control-sm" placeholder="Masukkan harga nominal">
+                    </div>
+                    <button onclick="simpanKustomisasi()" class="btn btn-sm btn-dark w-100 fw-bold"><i class="bi bi-plus-lg"></i> Simpan Spesifikasi Baru</button>
                 </div>
+            </div>
 
-                <h6 class="fw-bold small text-muted mb-2">Daftar Pilihan Aktif:</h6>
-                <div id="daftar-master-komponen" class="d-flex flex-column gap-2" style="max-height: 200px; overflow-y: auto;">
-                    </div>
+            <!-- CARD LIVE LIST VARIATION MASTER -->
+            <div class="card card-custom p-4 border-0 shadow-sm bg-white">
+                <h6 class="fw-bold text-muted mb-2">Daftar Spesifikasi Tersimpan</h6>
+                <div id="list-varian-aktif" class="d-flex flex-column gap-2" style="max-height: 350px; overflow-y: auto;">
+                    <!-- Diisi Otomatis oleh JavaScript -->
+                </div>
             </div>
         </div>
 
+        <!-- SEKSI KIRI: DASHBOARD ESTIMASI & TABEL UTAMA -->
         <div class="col-lg-8 order-lg-1">
             
+            <!-- TOTAL INVESTASI BOX -->
             <div class="total-budget-box d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 mb-4">
                 <div class="d-flex align-items-center gap-3">
                     <div class="p-3 bg-dark text-warning rounded-3 fs-4"><i class="bi bi-wallet2"></i></div>
                     <div>
                         <h6 class="m-0 fw-bold text-muted text-uppercase small">Estimasi Total Nilai Proyek (BoQ)</h6>
-                        <p class="m-0 text-muted small">Akumulasi dinamis berdasarkan kustomisasi komponen</p>
+                        <p class="m-0 text-muted small">Kalkulasi otomatis dari seluruh kombinasi infrastruktur FTTH</p>
                     </div>
                 </div>
                 <h2 id="grand-total" class="fw-800 text-dark m-0">Rp 0</h2>
             </div>
 
+            <!-- PANEL INPUT DATA PERENCANAAN -->
             <div class="card card-custom p-4 mb-4 no-print border-0">
                 <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
-                    <i class="bi bi-plus-circle text-primary"></i> Tambah Data Perencanaan
+                    <i class="bi bi-file-earmark-plus text-primary"></i> Tambah Item Perencanaan
                 </h5>
                 <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label small fw-bold text-muted">Pilih Komponen</label>
-                        <select id="input-jenis" class="form-select" onchange="sinkronHargaForm()"></select>
+                    <div class="col-md-5">
+                        <label class="form-label small fw-bold text-muted">Pilih Spesifikasi Komponen</label>
+                        <select id="input-item-pilihan" class="form-select" onchange="sinkronHargaInput()"></select>
                     </div>
                     <div class="col-md-4">
-                        <label id="label-lokasi" class="form-label small fw-bold text-muted">Lokasi / Keterangan</label>
-                        <input type="text" id="input-lokasi" class="form-control" placeholder="Contoh: Koordinat / Nama Jalan">
+                        <label class="form-label small fw-bold text-muted">Identitas Lokasi / Penempatan</label>
+                        <input type="text" id="input-lokasi" class="form-control" placeholder="Nama Jalan / Cluster / Nomor Tiang">
                     </div>
-                    <div class="col-md-4 d-none" id="col-panjang">
-                        <label class="form-label small fw-bold text-muted">Panjang Jaringan (Meter)</label>
-                        <input type="number" id="input-panjang" class="form-control" placeholder="100">
+                    <div class="col-md-3">
+                        <label id="label-volume" class="form-label small fw-bold text-muted">Jumlah / Volume</label>
+                        <input type="number" id="input-volume" class="form-control" value="1">
                     </div>
-                    <div class="col-md-4">
-                        <label id="label-biaya" class="form-label small fw-bold text-muted">Biaya Disesuaikan (Rp)</label>
-                        <input type="number" id="input-biaya" class="form-control" value="0">
+                    <div class="col-md-5">
+                        <label class="form-label small fw-bold text-muted">Harga Satuan (Bisa Diedit/Rp)</label>
+                        <!-- 🌟 ATRIBUT 'disabled' TELAH DIHAPUS SUPAYA HARGA BISA DIUBAH BEBAS -->
+                        <input type="number" id="input-harga-bebas" class="form-control" placeholder="Masukkan harga untuk item ini">
                     </div>
-                    <div class="col-12 text-end">
-                        <button onclick="tambahDataKeTabel()" class="btn btn-primary-custom px-4 d-inline-flex align-items-center gap-2">
-                            <i class="bi bi-plus-lg"></i> Masukkan ke Rincian
+                    <div class="col-md-7 d-flex align-items-end justify-content-end">
+                        <button onclick="tambahKeRincianTabel()" class="btn btn-primary-custom px-4 d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-plus-circle"></i> Masukkan ke Rincian BoQ
                         </button>
                     </div>
                 </div>
             </div>
 
+            <!-- TABEL LOG RINCIAN PERENCANAAN FTTH -->
             <div class="card card-custom p-4 border-0">
                 <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
-                    <i class="bi bi-list-stars text-secondary"></i> Rincian Jaringan Hasil Kustomisasi
+                    <i class="bi bi-list-check text-secondary"></i> Rincian Material & Konstruksi Lapangan
                 </h5>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle border-0 m-0" id="tabel-utama">
                         <thead class="table-light border-bottom border-top-0">
                             <tr>
-                                <th style="width: 8%">No</th>
-                                <th style="width: 22%">Komponen</th>
-                                <th style="width: 38%">Deskripsi Lokasi / Volume</th>
-                                <th style="width: 22%" class="text-end">Total Biaya</th>
+                                <th style="width: 6%">No</th>
+                                <th style="width: 28%">Spesifikasi Komponen</th>
+                                <th style="width: 36%">Lokasi & Volume</th>
+                                <th style="width: 20%" class="text-end">Total Biaya</th>
                                 <th style="width: 10%" class="text-center action-col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="tbody-data" class="border-0">
-                            </tbody>
+                            <!-- Masuk secara dinamis -->
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -221,155 +218,187 @@
 </div>
 
 <script>
-    // 1. DATA MASTER KOMPONENT DEFAULT (Bisa Ditambah/Hapus Secara Bebas dari Web)
-    let masterKomponen = {
-        "Tiang": { harga: 1200000, satuan: "Unit" },
-        "Kabel": { harga: 15000, satuan: "Meter" },
-        "ODP": { harga: 3500000, satuan: "Unit" },
-        "ODC": { harga: 15000000, satuan: "Unit" },
-        "Rumah": { harga: 500000, satuan: "Unit" }
-    };
+    // COUNTER VARIABEL UNTUK AUTO SEQUENCE GENERATOR
+    let urutanTiang = 1;
+    let urutanOdp = 1;
+    let urutanOdc = 1;
+    let urutanKabel = 1;
+    let urutanRumah = 1;
 
-    // Render Pilihan dropdown & list kustomisasi di awal load halaman
+    // PRESET MASTER DATA UTAMA
+    let databaseKomponen = [
+        { id: "t1", kategori: "Tiang", nama: "Tiang (Beton 7 Meter)", harga: 1250000, satuan: "Unit" },
+        { id: "t2", kategori: "Tiang", nama: "Tiang (Besi 9 Meter)", harga: 36500000, satuan: "Unit" },
+        { id: "k1", kategori: "Kabel", nama: "Kabel (Feeder 94 Core)", harga: 43875, satuan: "Meter" },
+        { id: "k2", kategori: "Kabel", nama: "Kabel (Drop Core 1 Core)", harga: 1500, satuan: "Meter" },
+        { id: "o1", kategori: "ODP", nama: "ODP (Solid 8 Port)", harga: 145000, satuan: "Unit" },
+        { id: "o2", kategori: "ODP", nama: "ODP (Closure 16 Port)", harga: 3800000, satuan: "Unit" },
+        { id: "odc", kategori: "ODC", nama: "ODC (Kapasitas 94 Core)", harga: 11310000, satuan: "Unit" },
+        { id: "rmh", kategori: "Rumah", nama: "Rumah Pelanggan (Homepass)", harga: 0, satuan: "Unit" }
+    ];
+
     window.onload = function() {
-        renderMasterKomponen();
+        jalankanRenderSistem();
     };
 
-    function renderMasterKomponen() {
-        let selectJenis = document.getElementById('input-jenis');
-        let listMaster = document.getElementById('daftar-master-komponen');
-        
-        // Simpan pilihan terpilih saat ini jika ada
-        let selectedValue = selectJenis.value;
-
-        selectJenis.innerHTML = "";
-        listMaster.innerHTML = "";
-
-        for (let key in masterKomponen) {
-            // Tambahkan ke dropdown Form Input
-            let option = document.createElement('option');
-            option.value = key;
-            option.innerText = `${key} (${masterKomponen[key].satuan})`;
-            selectJenis.appendChild(option);
-
-            // Tambahkan ke panel manajemen kanan
-            let itemDiv = document.createElement('div');
-            itemDiv.className = "d-flex justify-content-between align-items-center bg-white p-2 border rounded-3 small shadow-sm";
-            itemDiv.innerHTML = `
-                <div>
-                    <span class="fw-bold text-dark">${key}</span>
-                    <span class="text-muted d-block" style="font-size:11px;">${formatRupiah(masterKomponen[key].harga)} / ${masterKomponen[key].satuan}</span>
-                </div>
-                <button onclick="hapusMasterKomponen('${key}')" class="btn btn-sm btn-link text-danger p-0 border-0 no-print"><i class="bi bi-x-circle-fill"></i></button>
-            `;
-            listMaster.appendChild(listMaster.innerText === "" ? itemDiv : itemDiv);
-        }
-
-        // Kembalikan nilai dropdown terpilih atau set default ke elemen pertama
-        if(masterKomponen[selectedValue]) {
-            selectJenis.value = selectedValue;
-        }
-        sinkronHargaForm();
+    function gantiLabelSatuan() {
+        let kategori = document.getElementById('custom-kategori').value;
+        let label = document.getElementById('custom-label-harga');
+        label.innerText = (kategori === "Kabel") ? "Harga Satuan (Per Meter)" : "Harga Satuan (Per Unit)";
     }
 
-    // Fungsi menambah komponen baru ke sistem
-    function tambahKomponenKeMaster() {
+    function jalankanRenderSistem() {
+        let selectForm = document.getElementById('input-item-pilihan');
+        let listVarian = document.getElementById('list-varian-aktif');
+        let targetTerpilih = selectForm.value;
+
+        selectForm.innerHTML = "";
+        listVarian.innerHTML = "";
+
+        databaseKomponen.forEach((item) => {
+            let opt = document.createElement('option');
+            opt.value = item.id;
+            opt.innerText = `[${item.kategori.toUpperCase()}] — ${item.nama}`;
+            selectForm.appendChild(opt);
+
+            let divItem = document.createElement('div');
+            divItem.className = "d-flex justify-content-between align-items-center bg-light p-2 border rounded-3 small";
+            divItem.innerHTML = `
+                <div>
+                    <span class="fw-bold d-block text-dark" style="font-size:12px;">${item.nama}</span>
+                    <span class="text-muted" style="font-size:11px;">${formatRupiah(item.harga)} / ${item.satuan}</span>
+                </div>
+                <button onclick="hapusVarianSpesifikasi('${item.id}')" class="btn btn-sm text-danger p-0 border-0"><i class="bi bi-trash-fill"></i></button>
+            `;
+            listVarian.appendChild(divItem);
+        });
+
+        if (targetTerpilih && databaseKomponen.find(x => x.id === targetTerpilih)) {
+            selectForm.value = targetTerpilih;
+        }
+
+        sinkronHargaInput();
+    }
+
+    function sinkronHargaInput() {
+        let idTerpilih = document.getElementById('input-item-pilihan').value;
+        let labelVolume = document.getElementById('label-volume');
+        let inputHargaBebas = document.getElementById('input-harga-bebas');
+        let inputLokasi = document.getElementById('input-lokasi');
+        
+        let itemMatch = databaseKomponen.find(x => x.id === idTerpilih);
+        if(itemMatch) {
+            inputHargaBebas.value = itemMatch.harga; // Tetap memunculkan harga default sebagai referensi awal
+            labelVolume.innerText = itemMatch.satuan === "Meter" ? "Panjang (Meter)" : "Jumlah (Unit)";
+            
+            // Logika Otomatis Mengisi Nama Urutan Lokasi
+            if (itemMatch.kategori === "Tiang") {
+                inputLokasi.value = "Tiang " + urutanTiang;
+            } else if (itemMatch.kategori === "ODP") {
+                inputLokasi.value = "ODP " + urutanOdp;
+            } else if (itemMatch.kategori === "ODC") {
+                inputLokasi.value = "ODC " + urutanOdc;
+            } else if (itemMatch.kategori === "Kabel") {
+                inputLokasi.value = `Kabel ${urutanKabel} (Tiang ${urutanTiang} → Tiang ${urutanTiang})`;
+            } else if (itemMatch.kategori === "Rumah") {
+                inputLokasi.value = "Rumah " + urutanRumah;
+            }
+        }
+    }
+
+    function simpanKustomisasi() {
+        let kategori = document.getElementById('custom-kategori').value;
         let nama = document.getElementById('custom-nama').value.trim();
         let harga = parseFloat(document.getElementById('custom-harga').value);
-        let satuan = document.getElementById('custom-satuan').value;
+        let satuan = (kategori === "Kabel") ? "Meter" : "Unit";
 
-        if (!nama || isNaN(harga)) return alert("Harap isi Nama komponen dan Harga default dengan benar!");
-        
-        // Kapitalisasi awal kata
-        nama = nama.charAt(0).toUpperCase() + nama.slice(1);
+        if(!nama || isNaN(harga)) return alert("Harap isi nama spesifikasi baru dan nominal harganya!");
 
-        masterKomponen[nama] = { harga: harga, satuan: satuan };
-        
-        // Bersihkan form custom
+        let idBaru = (new Date().getTime()).toString();
+        databaseKomponen.push({ id: idBaru, kategori: kategori, nama: nama, harga: harga, satuan: satuan });
+
         document.getElementById('custom-nama').value = '';
         document.getElementById('custom-harga').value = '';
-        
-        renderMasterKomponen();
+
+        jalankanRenderSistem();
+        document.getElementById('input-item-pilihan').value = idBaru;
+        sinkronHargaInput();
     }
 
-    function hapusMasterKomponen(key) {
-        if(Object.keys(masterKomponen).length <= 1) return alert("Minimal harus menyisakan 1 komponen dalam sistem!");
-        delete masterKomponen[key];
-        renderMasterKomponen();
-    }
-
-    // Sinkronisasi otomatis form utama ketika dropdown diganti
-    function sinkronHargaForm() {
-        let jenis = document.getElementById('input-jenis').value;
-        let colPanjang = document.getElementById('col-panjang');
-        let labelLokasi = document.getElementById('label-lokasi');
-        let labelBiaya = document.getElementById('label-biaya');
-        let inputBiaya = document.getElementById('input-biaya');
-
-        if(!masterKomponen[jenis]) return;
-
-        inputBiaya.value = masterKomponen[jenis].harga;
-
-        if (masterKomponen[jenis].satuan === "Meter") {
-            colPanjang.classList.remove('d-none');
-            labelLokasi.innerText = "Titik Ruas (A → B)";
-            labelBiaya.innerText = "Biaya / Meter (Rp)";
-        } else {
-            colPanjang.classList.add('d-none');
-            labelLokasi.innerText = "Lokasi / Koordinat";
-            labelBiaya.innerText = "Biaya Satuan (Rp)";
-        }
+    function hapusVarianSpesifikasi(id) {
+        if(databaseKomponen.length <= 1) return alert("Sistem memerlukan setidaknya 1 material tersisa.");
+        databaseKomponen = databaseKomponen.filter(x => x.id !== id);
+        jalankanRenderSistem();
     }
 
     function formatRupiah(angka) {
         return "Rp " + parseFloat(angka).toLocaleString('id-ID');
     }
 
-    // Memasukkan data rancangan ke tabel BoQ rincian pro
-    function tambahDataKeTabel() {
-        let jenis = document.getElementById('input-jenis').value;
-        let lokasi = document.getElementById('input-lokasi').value;
-        let biaya = parseFloat(document.getElementById('input-biaya').value) || 0;
-        let panjang = parseFloat(document.getElementById('input-panjang').value) || 0;
+    function tambahKeRincianTabel() {
+        let idTerpilih = document.getElementById('input-item-pilihan').value;
+        let lokasi = document.getElementById('input-lokasi').value.trim();
+        let volume = parseFloat(document.getElementById('input-volume').value) || 0;
+        // 🌟 MENGAMBIL NILAI HARGA DARI INPUT YANG BISA DIEDIT KUSTOM
+        let hargaKustom = parseFloat(document.getElementById('input-harga-bebas').value) || 0;
 
-        if (!lokasi) return alert("Harap isi kolom Lokasi/Keterangan terlebih dahulu!");
-
-        let deskripsi = lokasi;
-        let totalBiayaItem = biaya;
-
-        if (masterKomponen[jenis].satuan === "Meter") {
-            if (panjang <= 0) return alert("Harap isi panjang meter jaringan dengan benar!");
-            deskripsi = `${lokasi} [Volume: ${panjang} meter]`;
-            totalBiayaItem = panjang * biaya;
-        } else {
-            deskripsi = `${lokasi} [Volume: 1 Unit]`;
+        if(!lokasi || volume <= 0 || hargaKustom < 0) {
+            return alert("Harap isi lokasi penempatan, volume, dan harga satuan dengan benar!");
         }
 
+        let itemMatch = databaseKomponen.find(x => x.id === idTerpilih);
+        if(!itemMatch) return;
+
+        // Perhitungan menggunakan harga kustom yang baru saja dimasukkan/diedit pengguna
+        let totalBiayaItem = hargaKustom * volume;
         let tbody = document.getElementById('tbody-data');
         let no = tbody.rows.length + 1;
         let row = tbody.insertRow();
 
+        let badgeClass = "badge-lainnya";
+        if(itemMatch.kategori === "Tiang") badgeClass = "badge-tiang";
+        if(itemMatch.kategori === "Kabel") badgeClass = "badge-kabel";
+        if(itemMatch.kategori === "ODP") badgeClass = "badge-odp";
+        if(itemMatch.kategori === "ODC") badgeClass = "badge-odc";
+        if(itemMatch.kategori === "Rumah") badgeClass = "badge-rumah";
+
         row.innerHTML = `
             <td class="fw-bold text-muted">${no}</td>
-            <td><span class="badge badge-component px-3 py-2 rounded-3 text-uppercase font-monospace">${jenis}</span></td>
-            <td class="fw-medium">${deskripsi}</td>
+            <td>
+                <span class="badge ${badgeClass} px-2 py-1 rounded-3 mb-1 text-uppercase font-monospace" style="font-size:10px;">${itemMatch.kategori}</span>
+                <span class="d-block small fw-bold text-dark">${itemMatch.nama}</span>
+                <small class="text-muted d-block" style="font-size: 11px;">@ ${formatRupiah(hargaKustom)}</small>
+            </td>
+            <td class="fw-medium text-secondary">
+                <i class="bi bi-geo-alt-fill text-danger small"></i> ${lokasi} 
+                <span class="badge bg-light text-dark border ms-1">${volume} ${itemMatch.satuan}</span>
+            </td>
             <td class="text-end fw-bold hitung-biaya text-dark" data-total="${totalBiayaItem}">${formatRupiah(totalBiayaItem)}</td>
-            <td class="text-center action-col"><button onclick="hapusBaris(this)" class="btn btn-sm btn-link text-danger p-0 border-0 m-0 text-decoration-none fw-bold"><i class="bi bi-trash3"></i> Hapus</button></td>
+            <td class="text-center action-col">
+                <button onclick="hapusBarisTabel(this)" class="btn btn-sm btn-link text-danger p-0 border-0 fw-bold text-decoration-none"><i class="bi bi-trash3"></i> Hapus</button>
+            </td>
         `;
 
-        hitungGrandTotal();
-        document.getElementById('input-lokasi').value = '';
-        document.getElementById('input-panjang').value = '';
+        if (itemMatch.kategori === "Tiang") urutanTiang++;
+        if (itemMatch.kategori === "ODP") urutanOdp++;
+        if (itemMatch.kategori === "ODC") urutanOdc++;
+        if (itemMatch.kategori === "Kabel") urutanKabel++;
+        if (itemMatch.kategori === "Rumah") urutanRumah++;
+
+        hitungGrandTotalProyek();
+        
+        document.getElementById('input-volume').value = '1';
+        sinkronHargaInput();
     }
 
-    function hapusBaris(btn) {
+    function hapusBarisTabel(btn) {
         btn.closest('tr').remove();
         let rows = document.querySelectorAll('#tbody-data tr');
         rows.forEach((r, i) => r.cells[0].innerText = i + 1);
-        hitungGrandTotal();
+        hitungGrandTotalProyek();
     }
 
-    function hitungGrandTotal() {
+    function hitungGrandTotalProyek() {
         let grandTotal = 0;
         document.querySelectorAll('.hitung-biaya').forEach(td => {
             grandTotal += parseFloat(td.getAttribute('data-total')) || 0;
